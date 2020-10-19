@@ -98,7 +98,6 @@ def create_healthchecks(healthcheck_list, client):
         print(f'+ Healthcheck created: {new_hc_id} {testing_hc_name}')
 
 
-
 # main code
 def main():
     # reads healthcheck info from csv file
@@ -115,12 +114,13 @@ def main():
     session = boto3.session.Session(profile_name='aws-prd')
     client = session.client('route53')
 
-    dry_run = False
     # create healthchecks if not dry run
+    dry_run = False
     if not dry_run:
         print('> Creating healthchecks... \n')
         create_healthchecks(new_hc_to_create, client)
         print('Healthchecks created.')
+
 
 if __name__ == '__main__':
     main()
