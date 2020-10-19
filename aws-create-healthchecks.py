@@ -110,13 +110,11 @@ def main():
     print('\n> Do you wish to proceed? [y/n]', end=' ')
     read_user_input()
 
-    # creates aws api sessions params
-    session = boto3.session.Session(profile_name='aws-prd')
-    client = session.client('route53')
-
     # create healthchecks if not dry run
-    dry_run = False
     if not dry_run:
+        # creates aws api sessions params
+        session = boto3.session.Session(profile_name='aws-prd')
+        client = session.client('route53')
         print('> Creating healthchecks... \n')
         create_healthchecks(new_hc_to_create, client)
         print('Healthchecks created.')
