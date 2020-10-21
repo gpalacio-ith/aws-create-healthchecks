@@ -5,6 +5,8 @@ import json
 import csv
 import random
 import string
+import os
+from datetime import datetime
 
 # apply changes or just test
 # TRUE for testing
@@ -103,21 +105,34 @@ def main():
     # reads healthcheck info from csv file
     new_hc_to_create = read_csv_file(file_name)
 
+    # write future changes to file
+    # create log folder if it does not exists
+    time_now = datetime.now().strftime('%Y_%m_%d_%H%M%S')
+    log_filename_b = 'log/new_healthchecks_' + time_now
+    if not os.path.exists('log'):
+        os.makedirs('log')
+    with open(log_filename_b, 'w') as file:
+        file.write(json.dumps(new_hc_to_create, indent=4))
+
     # prints healthchecks that will be created for review
     print('> The following healthchecks will be created...')
     print('> please read through the following to make sure everything is okay before proceeding.\n')
     print(json.dumps(new_hc_to_create, indent=4))
-    print('\n> Do you wish to proceed? [y/n]', end=' ')
-    read_user_input()
 
-    # create healthchecks if not dry run
-    if not dry_run:
+    # asks user for greenlight
+    print('\n> Do you wish to proceed? [y/n]', end=' ')
+    user_choice = read_user_input()
+
+    # create healthchecks if not dry run and user said yes
+    if not dry_run and user_choice:
         # creates aws api sessions params
         session = boto3.session.Session(profile_name='aws-prd')
         client = session.client('route53')
         print('> Creating healthchecks... \n')
         create_healthchecks(new_hc_to_create, client)
         print('Healthchecks created.')
+    else:
+        print('> No healthchecks were created. Quitting.')
 
 
 if __name__ == '__main__':
